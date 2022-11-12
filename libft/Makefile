@@ -1,10 +1,18 @@
-
-NAME		= libft.a
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: rmouhoub <rmouhoub@student.42.fr>          +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2022/11/10 16:09:23 by rmouhoub          #+#    #+#              #
+#    Updated: 2022/11/12 19:40:52 by rmouhoub         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
 
 SRCS		= ft_memset.c \
 			  ft_bzero.c \
 			  ft_memcpy.c \
-			  ft_memccpy.c \
 			  ft_memmove.c \
 			  ft_memchr.c \
 			  ft_memcmp.c \
@@ -35,6 +43,8 @@ SRCS		= ft_memset.c \
 			  ft_putstr_fd.c \
 			  ft_putendl_fd.c \
 			  ft_putnbr_fd.c
+			  
+OBJS	=	${SRCS:.c=.o}
 
 BNS_SRCS	= ft_lstnew.c \
 			  ft_lstadd_front.c \
@@ -43,29 +53,42 @@ BNS_SRCS	= ft_lstnew.c \
 			  ft_lstadd_back.c \
 			  ft_lstdelone.c \
 			  ft_lstclear.c \
-			  ft_lstiter.c \
 			  ft_lstmap.c \
-				
-OBJS		= $(SRCS:%.c=%.o)
+			  ft_lstiter.c
 
-BNS_OBJS	= $(BNS_SRCS:%.c=%.o)
+BONUS_OBJS = ${BNS_SRCS:.c=.o}
 
-FLAGS		= -Wall -Werror -Wextra
+NAME	= libft.a
 
-$(NAME):
-	gcc $(FLAGS) -c $(SRCS) -I ./
-	ar rc $(NAME) $(OBJS)
+CC		= gcc
+CFLAGS	= -Wall -Wextra -Werror
 
-all: $(NAME)
+so:
+	$(CC) -nostartfiles -fPIC $(CFLAGS) $(SRCS) ${BNS_SRCS}
+	gcc -nostartfiles -shared -o libft.so $(OBJS) ${BONUS_OBJS}
 
-bonus: $(NAME)
-	gcc $(FLAGS) -c $(BNS_SRCS) -I ./
-	ar rc $(NAME) $(BNS_OBJS)
+
+.c.o:
+				${CC} ${CFLAGS} -c $< -o ${<:.c=.o}
+
+all:		${NAME}
+
+$(NAME):	${OBJS}
+				ar rc ${NAME} ${OBJS}
+				ranlib ${NAME}
 
 clean:
-	rm -f $(OBJS) $(BNS_OBJS)
+				rm -f ${OBJS} ${BONUS_OBJS}
 
-fclean: clean
-	rm -f $(NAME)
+fclean:		clean
+				rm -f ${NAME}
 
-re: fclean all
+re:				fclean all
+
+rebonus:		fclean bonus
+
+bonus:		${OBJS} ${BONUS_OBJS}
+				ar rc ${NAME} ${OBJS} ${BONUS_OBJS}
+				ranlib ${NAME}
+
+.PHONY:			all clean fclean re bonus rebonus
